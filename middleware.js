@@ -3,12 +3,8 @@ const Review = require("./models/review");
 const ExpressError = require("./utils/ExpressError.js");
 const { listingSchema, reviewSchema } = require("./schema.js");
 
-
-//suppose user want to add new listing and it is not login, then we will not allow
-//to user to create  new list.  This req.isAuthenticated do this for us
 module.exports.isLoggedIn = (req, res, next) => {
     if(!req.isAuthenticated()){ 
-        //store a orignal URL
         req.session.redirectUrl = req.originalUrl;
 
         req.flash("error", "you must be logged in to create listing");
@@ -24,7 +20,6 @@ module.exports.saveRedirectUrl = (req, res, next ) =>{
     next();
 };
 
-//this is for checking owner is equal to currUser or not for listing
 module.exports.isOwner = async (req, res, next) => {
     let {id} = req.params;
     let listing = await Listing.findById(id);
@@ -35,7 +30,6 @@ module.exports.isOwner = async (req, res, next) => {
     next();
 };
 
-//this is for checking owner is equal to currUser or not for review
 module.exports.isReviewAuthor = async (req, res, next) => {
     let { id, reviewId } = req.params;
     let review = await Review.findById( reviewId );
@@ -46,9 +40,8 @@ module.exports.isReviewAuthor = async (req, res, next) => {
     next();
 };
 
-// func for validation for schema
 module.exports.validateListing = (req, res, next) => {
-    let {error} = listingSchema.validate(req.body); //take a only error from req.body
+    let {error} = listingSchema.validate(req.body); 
     if(error) {
         let errMsg = error.details.map((el) => el.message).join(",");
         throw new ExpressError(400, errMsg);
@@ -57,9 +50,8 @@ module.exports.validateListing = (req, res, next) => {
     }
 };
 
-//review validation for server side
 module.exports.validateReview = (req, res, next) => {
-    let {error} = reviewSchema.validate(req.body); //take a only error from req.body
+    let {error} = reviewSchema.validate(req.body);
     if(error) {
         let errMsg = error.details.map((el) => el.message).join(",");
         throw new ExpressError(400, errMsg);
